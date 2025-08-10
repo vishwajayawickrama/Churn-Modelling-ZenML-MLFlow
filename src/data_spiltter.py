@@ -24,9 +24,9 @@ class SimpleTrainTestSplitStratergy(DataSplittingStrategy):
         self.test_size = test_size
 
     def split_data(self, df: pd.DataFrame, target_column: str) ->Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
-        Y = df[target_column].values
+        Y = df[target_column]
         X = df.drop(columns=target_column)
 
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, self.test_size)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=self.test_size)
 
         return X_train, X_test, Y_test, Y_train

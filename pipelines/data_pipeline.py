@@ -113,4 +113,36 @@ def data_pipeline(
     print(f"Data after Fetaure Encoding \n{df.head()}")
     print(f"Data Shape after feature Encoding {df.shape}")
 
+    """
+        06. Feature Scaling
+    """
+    print("\nStep 6: Feature Scaling")
+    scaling_stratergy = MinMaxScalingStratergy()
+    df = scaling_stratergy.scale(df, scaling_config['columns_to_scale'])
+    print(f"Data after Feature Scaling \n{df.head()}")
+
+    """
+        07. Post Processing
+    """
+    print("\nStep 7: Post Processing")
+    df.drop(columns=['RowNumber', 'CustomerId', 'Firstname', 'Lastname'])
+    print(f"Data after post processing \n{df.head()}")
+
+    """
+        08. Data Splitting
+    """
+    print("\nStep 8: Data Splitting")
+    splitting_stratergy = SimpleTrainTestSplitStratergy(test_size=splitting_config['test_size'])
+    X_train, X_test, Y_train, Y_test = splitting_stratergy.split_data(df, 'Exited')
+
+    X_train.to_csv(x_train_path, index=False)
+    X_test.to_csv(x_test_path, index=False)
+    Y_train.to_csv(y_train_path, index=False)
+    Y_test.to_csv(y_test_path, index=False)
+
+    print(f"X Train Size : {X_train.shape}")
+    print(f"X Test Size : {X_test.shape}")
+    print(f"Y Train Size : {Y_train.shape}")
+    print(f"Y Test Size : {Y_test.shape}")
+
 data_pipeline()
