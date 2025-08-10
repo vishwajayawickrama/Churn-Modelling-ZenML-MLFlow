@@ -32,7 +32,7 @@ def data_pipeline(
     """
         01. Data Ingestion
     """
-    print('Step 1: Data Ingestion')
+    print('\nStep 1: Data Ingestion')
     artifacts_dir = os.path.join(os.path.dirname(__file__), '..', data_paths['data_artifacts_dir'])
     x_train_path = os.path.join(artifacts_dir, 'X_train.csv')
     x_test_path = os.path.join(artifacts_dir, 'X_test.csv')
@@ -57,7 +57,7 @@ def data_pipeline(
         """
             02. Handling Missong Values
         """
-        print('Step 2: Handle Missing Values')
+        print('\ntep 2: Handle Missing Values')
 
         drop_handler = DropMissingValuesStrategy(critical_columns=columns['critical_columns']) # Dropping Critical Rows in Columns
 
@@ -76,7 +76,7 @@ def data_pipeline(
         df = drop_handler.handle(df)
         df = age_hanlder.handle(df)
         df = gender_hanlder.handle(df)
-        df.to_csv('temp_imputed.csv')
+        df.to_csv('temp_imputed.csv', index=False)
         
     df = pd.read_csv('temp_imputed.csv')
     print(f"Data shape after Imputation {df.shape}")
@@ -84,10 +84,19 @@ def data_pipeline(
     """
         03. Handle Outliers
     """
-    print('Step 3: Handle Outliers')
+    print('\nStep 3: Handle Outliers')
 
     outlier_detector = OutlierDetector(strategy=IQROutlierDetection())
     df = outlier_detector.handle_outliers(df, columns['outlier_columns'])
     print(f"Data shape after outleir detected {df.shape}")
+
+    """
+        04. Feature Binning
+    """
+    print('\nStep 3: Feature Binning')
+
+    binning = CustomBinningStratergy(binning_config['credit_score_bins'])
+    df = binning.bin_feature(df, 'CreditScore')
+    print(f"Data after Feature Binning \n{df.head()}")
 
 data_pipeline()
