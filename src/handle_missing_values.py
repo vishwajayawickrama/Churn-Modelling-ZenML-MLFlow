@@ -36,10 +36,11 @@ class DropMissingValuesStrategy(MissingValueHandlingStrategy):
         return df_cleaned
 
 
-class Gender(str, Enum):
+class Gender(str, Enum): # String-based Enum – Inherits from str and Enum to behave like strings while keeping Enum features.
     MALE = "Male"
     FEMALE = "Female"
 
+#Pydantic define data models with type annotations and then validate and parse data automatically based on those models.
 class GenderPrediction(BaseModel):
     firstname: str 
     lastname: str

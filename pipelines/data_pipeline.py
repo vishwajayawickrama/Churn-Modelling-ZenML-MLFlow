@@ -6,7 +6,7 @@ import numpy as np
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from data_ingestion import DataIngestorCSV
 from handle_missing_values import DropMissingValuesStrategy, FillMissingValuesStrategy, GenderImputer
-from outlier_detection import IQROutlierDetection
+from outlier_detection import OutlierDetector, IQROutlierDetection
 from feature_binning import CustomBinningStratergy
 from feature_encoding import OrdinalEncodingStratergy, NominalEncodingStrategy
 from feature_scaling import MinMaxScalingStratergy
@@ -48,34 +48,46 @@ def data_pipeline(
         X_test =pd.read_csv(x_test_path)
         Y_train =pd.read_csv(y_train_path)
         Y_test =pd.read_csv(y_test_path)
-
-    ingestor = DataIngestorCSV()
-    df = ingestor.ingest(data_path)
-    print(f"Loaded Data Shape {df.shape}")
-
-    """
-        02. Handling Missing Values
-    """
-    print('Step 2: Handle Missing Values')
-
-    drop_handler = DropMissingValuesStrategy(critical_columns=columns['critical_columns']) # Dropping Critical Rows in Columns
-
-    age_hanlder = FillMissingValuesStrategy(
-                                                relavant_columns='Age',
-                                                method='mean'
-                                            )
     
-    gender_hanlder = FillMissingValuesStrategy(
-                                                relavant_columns='Gender',
-                                                method='mean',
-                                                is_custom_imputer=True,
-                                                custom_imputer=GenderImputer()
-                                            )
-    
-    df = drop_handler.handle(df)
-    df = age_hanlder.handle(df)
-    df = gender_hanlder.handle(df)
+    os.makedirs(data_paths['data_artifacts_dir'], exist_ok=True)#  exist_ok=True means: If the directory already exists, don’t raise an error — just proceed silently.If it doesn’t exist, create it (and any missing parent directories).
+    if not os.path.exists('temp_imputed.csv'):
+        ingestor = DataIngestorCSV()
+        df = ingestor.ingest(data_path)
+        print(f"Loaded Data Shape {df.shape}")
+        """
+            02. Handling Missong Values
+        """
+        print('Step 2: Handle Missing Values')
 
+        drop_handler = DropMissingValuesStrategy(critical_columns=columns['critical_columns']) # Dropping Critical Rows in Columns
+
+        age_hanlder = FillMissingValuesStrategy(
+                                                    relavant_columns='Age',
+                                                    method='mean'
+                                                )
+        
+        gender_hanlder = FillMissingValuesStrategy(
+                                                    relavant_columns='Gender',
+                                                    method='mean',
+                                                    is_custom_imputer=True,
+                                                    custom_imputer=GenderImputer()
+                                                )
+        
+        df = drop_handler.handle(df)
+        df = age_hanlder.handle(df)
+        df = gender_hanlder.handle(df)
+        df.to_csv('temp_imputed.csv')
+        
+    df = pd.read_csv('temp_imputed.csv')
     print(f"Data shape after Imputation {df.shape}")
+
+    """
+        03. Handle Outliers
+    """
+    print('Step 3: Handle Outliers')
+
+    outlier_detector = OutlierDetector(strategy=IQROutlierDetection())
+    df = outlier_detector.handle_outliers(df, columns['outlier_columns'])
+    print(f"Data shape after outleir detected {df.shape}")
 
 data_pipeline()
