@@ -35,7 +35,7 @@ class NominalEncodingStrategy(FeatureEncodingStrategy):
 
             encoder_path = os.path.join('artifacts/encode', f"{column}_encoder.json")
             with open(encoder_path, "w") as f:
-                json.dump(encoder_dict)
+                json.dump(encoder_dict, f)
 
             df[column] = df[column].map(encoder_dict)
 
@@ -47,7 +47,7 @@ class OrdinalEncodingStratergy(FeatureEncodingStrategy):
         self.ordinal_mappings = ordinal_mappings
 
     def encode(self, df: pd.DataFrame) ->pd.DataFrame:
-        for column, mapping in self.ordinal_mapping.item():
+        for column, mapping in self.ordinal_mappings.items():
             df[column] = df[column].map(mapping)
             logging.info(f"Encode ordinal variables with ")
             

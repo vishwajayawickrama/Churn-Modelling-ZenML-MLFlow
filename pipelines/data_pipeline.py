@@ -93,10 +93,24 @@ def data_pipeline(
     """
         04. Feature Binning
     """
-    print('\nStep 3: Feature Binning')
+    print('\nStep 4: Feature Binning')
 
     binning = CustomBinningStratergy(binning_config['credit_score_bins'])
     df = binning.bin_feature(df, 'CreditScore')
     print(f"Data after Feature Binning \n{df.head()}")
+
+    """
+        05. Feature Encoding
+    """
+    print('\nStep 5: Feature Encoding')
+
+    nominal_encoder = NominalEncodingStrategy(encoding_config['nominal_columns'])
+    ordinal_encoder = OrdinalEncodingStratergy(encoding_config['ordinal_mappings'])
+
+    df = nominal_encoder.encode(df)
+    df = ordinal_encoder.encode(df)
+
+    print(f"Data after Fetaure Encoding \n{df.head()}")
+    print(f"Data Shape after feature Encoding {df.shape}")
 
 data_pipeline()
