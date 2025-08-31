@@ -6,7 +6,6 @@ logging.basicConfig(level=logging.INFO, format=
 
 
 class FeatureBinningStrategy(ABC):
-
     @abstractmethod
     def bin_feature(self, df: pd.DataFrame, column: str) ->pd.DataFrame:
         pass
