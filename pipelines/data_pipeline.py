@@ -125,7 +125,7 @@ def data_pipeline(
         07. Post Processing
     """
     print("\nStep 7: Post Processing")
-    df.drop(columns=['RowNumber', 'CustomerId', 'Firstname', 'Lastname'])
+    df = df.drop(columns=['RowNumber', 'CustomerId', 'Firstname', 'Lastname'], axis=1)
     print(f"Data after post processing \n{df.head()}")
 
     """
@@ -145,4 +145,5 @@ def data_pipeline(
     print(f"Y Train Size : {Y_train.shape}")
     print(f"Y Test Size : {Y_test.shape}")
 
-data_pipeline()
+if __name__ == "__main__":
+    data_pipeline()

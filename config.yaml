@@ -1,9 +1,15 @@
 data_paths:
   raw_data: "data/raw/ChurnModelling.csv"
   processed_data: "data/processed/ChurnModelling_Missing_Values_Handled.csv"
+  imputed_data: "data/processed/imputed.csv"
+  processed_dir: "data/processed"
   artifacts_dir: "artifacts"
   data_artifacts_dir: "artifacts/data"
   model_artifacts_dir: "artifacts/models"
+  X_train: "artifacts/data/X_train.csv"
+  X_test: "artifacts/data/X_test.csv"
+  Y_train: "artifacts/data/Y_train.csv"
+  Y_test: "artifacts/data/Y_test.csv"
 
 columns:
   target: "Exited"
@@ -24,6 +30,7 @@ columns:
     - "IsActiveMember"
     - "EstimatedSalary"
 
+
 missing_values:
   strategy: "fill"
   methods:
@@ -37,10 +44,12 @@ missing_values:
       relevant_column: "Gender"
       use_gender_imputer: true
 
+
 outlier_detection:
   detection_method: "iqr"
   handling_method: "remove"
   z_score_threshold: 3.0
+
 
 feature_binning:
   credit_score_bins:
@@ -56,6 +65,7 @@ feature_binning:
     Very Good: 3
     Excellent: 4
 
+
 feature_encoding:
   nominal_columns: ["Geography", "Gender"]
   ordinal_mappings:
@@ -66,15 +76,18 @@ feature_encoding:
       Very Good: 3
       Excellent: 4
 
+
 feature_scaling:
   scaling_type: "minmax"
   columns_to_scale: ["Balance", "EstimatedSalary"]
+
 
 data_splitting:
   split_type: "simple"
   test_size: 0.2
   random_state: 42
   n_splits: 5
+
 
 training:
   default_model_type: "random_forest"
@@ -90,6 +103,7 @@ training:
     search_method: "grid"
     cv_folds: 5
     n_iter: 20
+
 
 model:
   model_type: "random_forest"
@@ -117,6 +131,7 @@ model:
       random_state: 42
       probability: true
 
+
 evaluation:
   metrics:
     - "accuracy"
@@ -126,11 +141,13 @@ evaluation:
   cv_folds: 5
   random_state: 42
 
+
 deployment:
   model_name: "churn_analysis_model"
   model_version: "1.0.0"
   api_endpoint: "/predict"
   batch_size: 1000
+
 
 inference:
   model_name: "random_forest_cv_model"
@@ -140,13 +157,29 @@ inference:
   batch_size: 1000
   return_proba: true
 
+
 logging:
   level: "INFO"
   format: "%(asctime)s - %(levelname)s - %(message)s"
   file: "pipeline.log"
 
+
+mlflow:
+  tracking_uri: "file:./mlruns"  # Local file-based tracking
+  experiment_name: "Zuu Crew Churn Analysis"
+  model_registry_name: "churn_prediction"
+  artifact_path: "model"
+  run_name_prefix: "churn_run"
+  tags:
+    project: "customer_churn_prediction"
+    team: "ml_engineering"
+    environment: "development"
+  autolog: true
+
+
 environment:
   experiment_name: "churn_analysis"
+
 
 pipeline:
   data_pipeline_name: "data_processing_pipeline"

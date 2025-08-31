@@ -29,4 +29,4 @@ class SimpleTrainTestSplitStratergy(DataSplittingStrategy):
 
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=self.test_size)
 
-        return X_train, X_test, Y_test, Y_train
+        return X_train, X_test, Y_train, Y_test
