@@ -8,7 +8,7 @@ from typing import Dict, Any, Tuple, Optional
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from model_building import RandomForestModelBuilder, XGboostModelBuilder
 from model_training import ModelTrainer
-#from model_evaluation import ModelEvaluator
+from model_evaluation import ModelEvaluator
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from config import get_model_config, get_data_paths
 logging.basicConfig(level=logging.INFO, format=
@@ -40,13 +40,15 @@ def training_pipeline(
     model  = model_builder.build_model()
     
     trainer = ModelTrainer()
-    model, train_score = trainer.tain(
+    model, _ = trainer.tain(
                                         model = model,
                                         X_train=X_train,
                                         Y_train = Y_train
                                     )
+    trainer.save_model(model, model_path)
     
-    print(train_score)
+    evaluator = ModelEvaluator(model, 'XGBoost')
+    evaluator.evaluate(X_test, Y_test)
 
 if __name__ == "__main__":
     model_config = get_model_config()
