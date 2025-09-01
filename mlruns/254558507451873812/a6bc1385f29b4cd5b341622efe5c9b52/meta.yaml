@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/vishwajayawickrama/Desktop/Zuu Crew Hands on ML/Projects/Churn-Modelling-ZenML-MLFlow/mlruns/254558507451873812/a6bc1385f29b4cd5b341622efe5c9b52/artifacts
+end_time: 1756746526716
+entry_point_name: ''
+experiment_id: '254558507451873812'
+lifecycle_stage: active
+run_id: a6bc1385f29b4cd5b341622efe5c9b52
+run_name: training pipeline | 2025-09-01 22:38:46
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1756746526477
+status: 3
+tags: []
+user_id: vishwajayawickrama

@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
 from model_building import RandomForestModelBuilder, XGboostModelBuilder
 from model_training import ModelTrainer
 from model_evaluation import ModelEvaluator
+from mlflow_utils import MLflowTracker, setup_mlflow_autolog, create_mlflow_run_tags
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'utils'))
 from config import get_model_config, get_data_paths
 logging.basicConfig(level=logging.INFO, format=
@@ -31,6 +32,19 @@ def training_pipeline(
     else:
         print("Loading Data Artifacts from Data Pipeline.")
 
+    mlflow_tracker = MLflowTracker()
+    run_tags = create_mlflow_run_tags(
+                                    'training_pipeline', {
+                                                        'model_type' : 'XGboost',
+                                                        'training_strategy' : 'simple',
+                                                        'other_models' : 'randomforest',
+                                                        'data_path': data_path,
+                                                        'model_path': model_path
+                                                        }
+                                                        )
+    run = mlflow_tracker.start_run(run_name='training_pipeline', tags=run_tags)
+
+
     X_train = pd.read_csv(get_data_paths()['X_train'])
     X_test = pd.read_csv(get_data_paths()['X_test'])
     Y_train = pd.read_csv(get_data_paths()['Y_train'])
@@ -48,7 +62,14 @@ def training_pipeline(
     trainer.save_model(model, model_path)
     
     evaluator = ModelEvaluator(model, 'XGBoost')
-    evaluator.evaluate(X_test, Y_test)
+    evaluation_results = evaluator.evaluate(X_test, Y_test)
+    evaluation_results_cp = evaluation_results.copy()
+    del evaluation_results_cp['cm']
+
+    model_params = get_model_config()['model_params']
+    mlflow_tracker.log_training_metrics(model, evaluation_results_cp, model_params)
+
+    mlflow_tracker.end_run()
 
 if __name__ == "__main__":
     model_config = get_model_config()

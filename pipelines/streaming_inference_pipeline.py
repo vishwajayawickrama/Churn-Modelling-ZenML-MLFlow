@@ -37,3 +37,17 @@ if __name__ == '__main__':
         }
     pred = streming_inference(inference, data)
     print(pred)
+
+
+
+"""📌 Inference Types:
+ Batch Inference:
+   - Runs predictions on large datasets at once (e.g., daily, weekly).
+   - Higher latency, not real-time.
+   - Example: Predicting monthly customer churn for all users overnight.
+
+ Streaming Inference:
+   - Runs predictions continuously as new data arrives.
+   - Very low latency, real-time or near real-time.
+   - Example: Detecting fraudulent transactions instantly as they happen.
+"""

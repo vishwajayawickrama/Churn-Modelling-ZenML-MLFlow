@@ -1,0 +1,10 @@
+artifact_location: file:///Users/vishwajayawickrama/Desktop/Zuu Crew Hands on ML/Projects/Churn-Modelling-ZenML-MLFlow/mlruns/254558507451873812/models/m-3812490558ad46ce8c22856d40aa211a/artifacts
+creation_timestamp: 1756746709804
+experiment_id: '254558507451873812'
+last_updated_timestamp: 1756746711419
+model_id: m-3812490558ad46ce8c22856d40aa211a
+model_type: null
+name: model
+source_run_id: 23ff1fd782f64af9ae49b8d588bbc116
+status: 2
+status_message: null

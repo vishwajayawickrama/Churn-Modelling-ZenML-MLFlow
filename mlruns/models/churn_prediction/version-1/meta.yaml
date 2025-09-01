@@ -1,0 +1,18 @@
+aliases: []
+creation_timestamp: 1756746711425
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1756746711425
+metrics: null
+model_id: m-3812490558ad46ce8c22856d40aa211a
+name: churn_prediction
+params: null
+run_id: 23ff1fd782f64af9ae49b8d588bbc116
+run_link: null
+source: models:/m-3812490558ad46ce8c22856d40aa211a
+status: READY
+status_message: null
+storage_location: file:///Users/vishwajayawickrama/Desktop/Zuu Crew Hands on ML/Projects/Churn-Modelling-ZenML-MLFlow/mlruns/254558507451873812/models/m-3812490558ad46ce8c22856d40aa211a/artifacts
+user_id: null
+version: 1
