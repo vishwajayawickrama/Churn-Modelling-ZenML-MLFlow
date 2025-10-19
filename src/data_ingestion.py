@@ -58,22 +58,51 @@ class DataIngestorCSV(DataIngestor):
         try:
             # Default CSV options
             csv_options = {
-                        "header": "true",
-                        "inferSchema": "true",
-                        "ignoreLeadingWhiteSpace": "true",
-                        "ignoreTrailingWhiteSpace": "true",
-                        "nullValue": "",
-                        "nanValue": "NaN",
-                        "escape": '"',
-                        "quote": '"'
-                        }
+                "header": "true",
+                "inferSchema": "true",
+                "ignoreLeadingWhiteSpace": "true",
+                "ignoreTrailingWhiteSpace": "true",
+                "nullValue": "",
+                "nanValue": "NaN",
+                "escape": '"',
+                "quote": '"'
+            }
             csv_options.update(options)
             
             ############### PANDAS CODES ###########################
             # df = pd.read_csv(file_path_or_link)
             
             ############### PYSPARK CODES ###########################
+            # Read CSV file
             df = self.spark.read.options(**csv_options).csv(file_path_or_link)
+            
+            # Get DataFrame info
+            row_count = df.count()
+            columns = df.columns
+            
+            # Calculate approximate memory usage
+            # Note: This is an estimate as PySpark distributes data
+            sample_size = min(1000, row_count)
+            if row_count > 0:
+                sample_df = df.limit(sample_size).toPandas()
+                memory_per_row = sample_df.memory_usage(deep=True).sum() / sample_size
+                estimated_memory = (memory_per_row * row_count) / 1024**2
+            else:
+                estimated_memory = 0
+            
+            ############### PANDAS CODES ###########################
+            # logger.info(f"✓ Successfully loaded CSV data - Shape: {df.shape}, Columns: {list(df.columns)}")
+            # logger.info(f"✓ Memory usage: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+            
+            ############### PYSPARK CODES ###########################
+            logger.info(f"✓ Successfully loaded CSV data - Shape: ({row_count}, {len(columns)})")
+            logger.info(f"✓ Columns: {columns}")
+            logger.info(f"✓ Estimated memory usage: {estimated_memory:.2f} MB")
+            logger.info(f"✓ Partitions: {df.rdd.getNumPartitions()}")
+            
+            logger.info(f"{'='*60}\n")
+            
+            return df
             
         except Exception as e:
             logger.error(f"✗ Failed to load CSV data from {file_path_or_link}: {str(e)}")
@@ -113,8 +142,28 @@ class DataIngestorExcel(DataIngestor):
             # df = pd.read_excel(file_path_or_link)
             
             ############### PYSPARK CODES ###########################
-            pandas_df = pd.read_excel(file_path_or_link)
+            # Read Excel with pandas first
+            pandas_df = pd.read_excel(file_path_or_link, sheet_name=sheet_name)
+            
+            # Convert to PySpark DataFrame
             df = self.spark.createDataFrame(pandas_df)
+            
+            # Get DataFrame info
+            row_count = df.count()
+            columns = df.columns
+            
+            ############### PANDAS CODES ###########################
+            # logger.info(f"✓ Successfully loaded Excel data - Shape: {df.shape}, Columns: {list(df.columns)}")
+            # logger.info(f"✓ Memory usage: {df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+            
+            ############### PYSPARK CODES ###########################
+            logger.info(f"✓ Successfully loaded Excel data - Shape: ({row_count}, {len(columns)})")
+            logger.info(f"✓ Columns: {columns}")
+            logger.info(f"✓ Partitions: {df.rdd.getNumPartitions()}")
+            
+            logger.info(f"{'='*60}\n")
+            
+            return df
             
         except Exception as e:
             logger.error(f"✗ Failed to load Excel data from {file_path_or_link}: {str(e)}")
@@ -144,7 +193,20 @@ class DataIngestorParquet(DataIngestor):
         
         try:
             # Read Parquet file(s)
-            df = self.spark.read.options(**csv_options).parquet(file_path_or_link)
+            df = self.spark.read.options(**options).parquet(file_path_or_link)
+            
+            # Get DataFrame info
+            row_count = df.count()
+            columns = df.columns
+            
+            # Parquet files are already compressed and optimized
+            logger.info(f"✓ Successfully loaded Parquet data - Shape: ({row_count}, {len(columns)})")
+            logger.info(f"✓ Columns: {columns}")
+            logger.info(f"✓ Partitions: {df.rdd.getNumPartitions()}")
+            logger.info(f"✓ Schema: {df.schema.simpleString()}")
+            logger.info(f"{'='*60}\n")
+            
+            return df
             
         except Exception as e:
             logger.error(f"✗ Failed to load Parquet data from {file_path_or_link}: {str(e)}")

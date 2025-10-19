@@ -1,3 +1,8 @@
+"""
+PySpark-based data processing pipeline for customer churn prediction.
+Supports both CSV and Parquet output formats with comprehensive preprocessing.
+"""
+
 import os
 import sys
 import logging
@@ -34,6 +39,9 @@ from mlflow_utils import MLflowTracker, setup_mlflow_autolog, create_mlflow_run_
 import mlflow
 
 
+# Visualization functions removed for Week 07 - focus on core PySpark processing
+
+
 def log_stage_metrics(df: DataFrame, stage: str, additional_metrics: Dict = None, spark: SparkSession = None):
     """Log key metrics for each processing stage."""
     try:
@@ -44,11 +52,11 @@ def log_stage_metrics(df: DataFrame, stage: str, additional_metrics: Dict = None
         total_missing = sum(missing_counts)
         
         metrics = {
-                    f'{stage}_rows': df.count(),
-                    f'{stage}_columns': len(df.columns),
-                    f'{stage}_missing_values': total_missing,
-                    f'{stage}_partitions': df.rdd.getNumPartitions()
-                    }
+            f'{stage}_rows': df.count(),
+            f'{stage}_columns': len(df.columns),
+            f'{stage}_missing_values': total_missing,
+            f'{stage}_partitions': df.rdd.getNumPartitions()
+        }
         
         if additional_metrics:
             metrics.update({f'{stage}_{k}': v for k, v in additional_metrics.items()})
@@ -61,12 +69,12 @@ def log_stage_metrics(df: DataFrame, stage: str, additional_metrics: Dict = None
 
 
 def save_processed_data(
-                        X_train: DataFrame, 
-                        X_test: DataFrame, 
-                        Y_train: DataFrame, 
-                        Y_test: DataFrame,
-                        output_format: str = "both"
-                        ) -> Dict[str, str]:
+    X_train: DataFrame, 
+    X_test: DataFrame, 
+    Y_train: DataFrame, 
+    Y_test: DataFrame,
+    output_format: str = "both"
+) -> Dict[str, str]:
     """
     Save processed data in specified format(s).
     
@@ -332,12 +340,12 @@ def data_pipeline(
             
             # Save metadata about the preprocessing
             preprocessing_metadata = {
-                                    'scaling_columns': scaling_config['columns_to_scale'],
-                                    'encoding_columns': encoding_config['nominal_columns'],
-                                    'ordinal_mappings': encoding_config['ordinal_mappings'],
-                                    'binning_config': binning_config,
-                                    'spark_version': spark.version
-                                    }
+                'scaling_columns': scaling_config['columns_to_scale'],
+                'encoding_columns': encoding_config['nominal_columns'],
+                'ordinal_mappings': encoding_config['ordinal_mappings'],
+                'binning_config': binning_config,
+                'spark_version': spark.version
+            }
             
             with open(os.path.join(model_path, 'metadata.json'), 'w') as f:
                 json.dump(preprocessing_metadata, f, indent=2)
@@ -407,12 +415,12 @@ def data_pipeline(
         logger.info("✓ PySpark data pipeline completed successfully!")
         
         return {
-                'X_train': X_train_np,
-                'X_test': X_test_np,
-                'Y_train': Y_train_np,
-                'Y_test': Y_test_np
-                }
-            
+            'X_train': X_train_np,
+            'X_test': X_test_np,
+            'Y_train': Y_train_np,
+            'Y_test': Y_test_np
+        }
+        
     except Exception as e:
         logger.error(f"✗ Data pipeline failed: {str(e)}")
         if 'mlflow_tracker' in locals():

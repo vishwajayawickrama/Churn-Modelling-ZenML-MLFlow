@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 
 def create_spark_session(
-                        app_name: str = "ChurnPredictionPipeline",
-                        master: str = "local[*]",
-                        config_options: Optional[dict] = None
-                        ) -> SparkSession:
+    app_name: str = "ChurnPredictionPipeline",
+    master: str = "local[*]",
+    config_options: Optional[dict] = None
+) -> SparkSession:
     """
     Create or get an existing SparkSession with optimized configuration.
     
@@ -29,20 +29,20 @@ def create_spark_session(
     try:
         # Base configuration for optimal performance
         builder = SparkSession.builder \
-                                    .appName(app_name) \
-                                    .master(master) \
-                                    .config("spark.sql.adaptive.enabled", "true") \
-                                    .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
-                                    .config("spark.sql.adaptive.skewJoin.enabled", "true") \
-                                    .config("spark.sql.adaptive.localShuffleReader.enabled", "true") \
-                                    .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
-                                    .config("spark.sql.execution.arrow.pyspark.fallback.enabled", "true") \
-                                    .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
-                                    .config("spark.sql.shuffle.partitions", "200") \
-                                    .config("spark.sql.parquet.compression.codec", "snappy") \
-                                    .config("spark.sql.parquet.mergeSchema", "false") \
-                                    .config("spark.sql.parquet.filterPushdown", "true") \
-                                    .config("spark.sql.csv.parser.columnPruning.enabled", "true")
+            .appName(app_name) \
+            .master(master) \
+            .config("spark.sql.adaptive.enabled", "true") \
+            .config("spark.sql.adaptive.coalescePartitions.enabled", "true") \
+            .config("spark.sql.adaptive.skewJoin.enabled", "true") \
+            .config("spark.sql.adaptive.localShuffleReader.enabled", "true") \
+            .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
+            .config("spark.sql.execution.arrow.pyspark.fallback.enabled", "true") \
+            .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
+            .config("spark.sql.shuffle.partitions", "200") \
+            .config("spark.sql.parquet.compression.codec", "snappy") \
+            .config("spark.sql.parquet.mergeSchema", "false") \
+            .config("spark.sql.parquet.filterPushdown", "true") \
+            .config("spark.sql.csv.parser.columnPruning.enabled", "true")
         
         # Apply additional configuration if provided
         if config_options:

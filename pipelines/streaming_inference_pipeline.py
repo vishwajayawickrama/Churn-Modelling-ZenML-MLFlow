@@ -20,7 +20,7 @@ import mlflow
 
 
 def initialize_inference_system(
-    model_path: str = 'artifacts/models/churn_analysis.joblib',
+    model_path: str = 'artifacts/models/spark_random_forest_model',
     encoders_path: str = 'artifacts/encode'
 ) -> ModelInference:
     """

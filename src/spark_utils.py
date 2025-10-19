@@ -29,11 +29,11 @@ def spark_to_pandas(df: DataFrame, max_records: Optional[int] = None) -> pd.Data
         
         # Use Arrow optimization if available
         try:
-            pandas_df = df.toPandas() # columnar 
+            pandas_df = df.toPandas()
         except:
             # Fallback to regular conversion
             logger.warning("Arrow optimization not available, using standard conversion")
-            pandas_df = df.toPandas() # row-by-row
+            pandas_df = df.toPandas()
         
         logger.info(f"✓ Converted PySpark DataFrame to pandas: {pandas_df.shape}")
         return pandas_df
@@ -44,12 +44,12 @@ def spark_to_pandas(df: DataFrame, max_records: Optional[int] = None) -> pd.Data
 
 
 def save_dataframe(
-                    df: DataFrame,
-                    path: str,
-                    format: str = "parquet",
-                    mode: str = "overwrite",
-                    **options
-                    ) -> None:
+    df: DataFrame,
+    path: str,
+    format: str = "parquet",
+    mode: str = "overwrite",
+    **options
+) -> None:
     """
     Save PySpark DataFrame in specified format with error handling.
     
@@ -66,13 +66,13 @@ def save_dataframe(
         if format == "csv":
             # Default CSV options
             csv_options = {
-                            "header": "true",
-                            "inferSchema": "true",
-                            "escape": '"',
-                            "quote": '"',
-                            "ignoreLeadingWhiteSpace": "true",
-                            "ignoreTrailingWhiteSpace": "true"
-                            }
+                "header": "true",
+                "inferSchema": "true",
+                "escape": '"',
+                "quote": '"',
+                "ignoreLeadingWhiteSpace": "true",
+                "ignoreTrailingWhiteSpace": "true"
+            }
             csv_options.update(options)
             writer.options(**csv_options).csv(path)
             
@@ -98,12 +98,12 @@ def save_dataframe(
 
 
 def load_dataframe(
-                    spark: SparkSession,
-                    path: str,
-                    format: str = "parquet",
-                    schema: Optional[StructType] = None,
-                    **options
-                    ) -> DataFrame:
+    spark: SparkSession,
+    path: str,
+    format: str = "parquet",
+    schema: Optional[StructType] = None,
+    **options
+) -> DataFrame:
     """
     Load DataFrame from specified format with error handling.
     

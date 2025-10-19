@@ -100,12 +100,35 @@ class ModelInference:
             raise FileNotFoundError(f"Model file not found: {self.model_path}")
         
         try:
-            self.model = joblib.load(self.model_path)
-            file_size = os.path.getsize(self.model_path) / (1024**2)  # MB
+            import time
+            start_time = time.time()
             
-            logger.info(f"✓ Model loaded successfully:")
+            # Check if it's a PySpark model (directory) or scikit-learn model (file)
+            if os.path.isdir(self.model_path):
+                # PySpark model
+                logger.info("Detected PySpark model directory")
+                if not self.use_spark:
+                    # Initialize Spark session for PySpark model
+                    self.use_spark = True
+                    self.spark = get_or_create_spark_session()
+                
+                from pyspark.ml import PipelineModel
+                self.model = PipelineModel.load(self.model_path)
+                self.model_type = 'pyspark'
+                logger.info("✓ PySpark model loaded successfully")
+                
+            else:
+                # Scikit-learn model
+                logger.info("Detected scikit-learn model file")
+                self.model = joblib.load(self.model_path)
+                self.model_type = 'sklearn'
+                file_size = os.path.getsize(self.model_path) / (1024**2)  # MB
+                logger.info(f"  • File Size: {file_size:.2f} MB")
+                logger.info("✓ Scikit-learn model loaded successfully")
+            
+            load_time = time.time() - start_time
             logger.info(f"  • Model Type: {type(self.model).__name__}")
-            logger.info(f"  • File Size: {file_size:.2f} MB")
+            logger.info(f"  • Load Time: {load_time:.2f} seconds")
             
         except Exception as e:
             logger.error(f"✗ Failed to load model: {str(e)}")
@@ -315,14 +338,29 @@ class ModelInference:
             # Preprocess input data
             processed_data = self.preprocess_input(data)
             
-            # Make prediction
+            # Make prediction based on model type
             logger.info("Generating predictions...")
-            y_pred = self.model.predict(processed_data)
-            y_proba = self.model.predict_proba(processed_data)[:, 1]
             
-            # Process results
-            prediction = int(y_pred[0])
-            probability = float(y_proba[0])
+            if hasattr(self, 'model_type') and self.model_type == 'pyspark':
+                # PySpark model prediction
+                spark_df = self.spark.createDataFrame(processed_data)
+                predictions = self.model.transform(spark_df)
+                
+                # Get prediction and probability
+                prediction_row = predictions.select("prediction", "probability").collect()[0]
+                prediction = int(prediction_row.prediction)
+                
+                # Extract probability for positive class (index 1)
+                probability_vector = prediction_row.probability
+                probability = float(probability_vector[1])
+                
+            else:
+                # Scikit-learn model prediction
+                y_pred = self.model.predict(processed_data)
+                y_proba = self.model.predict_proba(processed_data)[:, 1]
+                
+                prediction = int(y_pred[0])
+                probability = float(y_proba[0])
             
             status = 'Churn' if prediction == 1 else 'Retain'
             confidence = round(probability * 100, 2)
