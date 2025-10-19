@@ -5,7 +5,6 @@ from xgboost import XGBClassifier
 from abc import ABC, abstractmethod
 from sklearn.ensemble import RandomForestClassifier
 
-
 class BaseModelBuilder(ABC):
     def __init__(
                 self,
@@ -20,7 +19,6 @@ class BaseModelBuilder(ABC):
     def build_model(self):
         pass 
 
-
     def save_model(self, filepath):
         if self.model is None:
             raise ValueError("No model to save. Build the model first.")
@@ -33,7 +31,6 @@ class BaseModelBuilder(ABC):
         
         self.model = joblib.load(filepath)
 
-
 class RandomForestModelBuilder(BaseModelBuilder):
     def __init__(self, **kwargs):
         default_params = {
@@ -45,7 +42,6 @@ class RandomForestModelBuilder(BaseModelBuilder):
                         }
         default_params.update(kwargs)
         super().__init__('RandomForest', **default_params)
-
 
     def build_model(self):
         self.model = RandomForestClassifier(**self.model_params)
@@ -60,7 +56,6 @@ class XGboostModelBuilder(BaseModelBuilder):
                         }
         default_params.update(kwargs)
         super().__init__('XGboost', **default_params)
-
 
     def build_model(self):
         self.model = XGBClassifier(**self.model_params)

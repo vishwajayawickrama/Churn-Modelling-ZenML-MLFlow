@@ -7,9 +7,12 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from pathlib import Path
+
 from config import get_mlflow_config
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 class MLflowTracker:
     """MLflow tracking utilities for experiment management and model versioning"""
@@ -237,12 +240,14 @@ class MLflowTracker:
         except Exception as e:
             logger.error(f"Error ending MLflow run: {e}")
 
+
 def setup_mlflow_autolog():
     """Setup MLflow autologging for supported frameworks"""
     mlflow_config = get_mlflow_config()
     if mlflow_config.get('autolog', True):
         mlflow.sklearn.autolog()
         logger.info("MLflow autologging enabled for scikit-learn")
+
 
 def create_mlflow_run_tags(pipeline_type: str, additional_tags: Optional[Dict[str, str]] = None) -> Dict[str, str]:
     """Create standardized tags for MLflow runs"""
